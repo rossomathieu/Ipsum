@@ -16,6 +16,7 @@ class AERenderWindow {
 public:
 
 	AERenderWindow();
+	virtual ~AERenderWindow();
 
 	virtual void create(const std::string &name, unsigned int width, unsigned int height, bool fullScreen) = 0;
 

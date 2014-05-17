@@ -1,4 +1,4 @@
-#pragma once
+//#pragma once
 
 #include <string>
 
@@ -10,9 +10,9 @@ namespace aeg {
 
 	class AEShader {
 
-	protected:
+	public:
 
-		enum AEshader{
+		enum ShaderType{
 
 			AE_VERTEX_SHADER,
 			AE_FRAGMENT_SHADER,
@@ -27,7 +27,7 @@ namespace aeg {
 
 		@throws std::exception if an error occurs
 		*/
-		virtual AEShader shaderFromFile(const std::string& filePath, AEshader shaderType);
+		virtual AEShader shaderFromFile(const std::string& filePath, ShaderType shaderType);
 
 		/**
 		Creates a shader from a string of shader source code.
@@ -37,20 +37,20 @@ namespace aeg {
 
 		@throws std::exception if an error occurs.
 		*/
-		AEShader(const std::string& shaderCode, AEshader shaderType);
+		AEShader(const std::string& shaderCode, ShaderType shaderType);
 
 		/**
 		@result		The shader's object ID
 		*/
-		unsigned int object() const;
+		virtual unsigned int object() const;
 
 		//aeg::AEShader objects can be copied and assigned because they are referenced counted
 		//like a shadered pointer
 		AEShader(const AEShader& other);
 		AEShader& operator =(const AEShader& other);
-		~AEShader();
+		virtual ~AEShader();
 
-	protected:
+	private:
 
 		unsigned int mShaderObject;
 		unsigned* mRefCount;

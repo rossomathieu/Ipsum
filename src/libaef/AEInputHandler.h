@@ -14,7 +14,7 @@
 #include "AEMouse.hpp"
 #include "AEKeyboard.hpp"
 
-class AEInputHandler : public AESingleton {
+class AEInputHandler {
 public:
 	enum AbstractControlIndex{
 
