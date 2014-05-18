@@ -2,7 +2,8 @@
  * Class: quat
  * Implements:
  * Author: Ross O. Mathieu
- * Description: Simple quat class. I hate quaternions....
+ * Description: Simple quat class. Quaternions are
+ * annoying, yet useful...
  */
 
 #pragma once
@@ -18,7 +19,7 @@ class quat {
 
 public:
 
-	quat(void);
+	quat(void) : x(0), y(0), z(0), w(0){};
 	quat(float x, float y, float z, float w) {
 
 		this->x = x;
@@ -43,7 +44,7 @@ public:
 		this->z = v.z;
 	}
 
-	~quat(void);
+	~quat(void) {};
 
 	float x;
 	float y;
@@ -51,16 +52,16 @@ public:
 	float w;
 
 	//Build the 4th compenent from 3 component quats
-	float generateW(quat &q) {
+	static float generateW(quat &q) {
 
-		float w0 = 1.0f - (x * x) - (y * y) - (z * z);
+		float w0 = 1.0f - (q.x * q.x) - (q.y * q.y) - (q.z * q.z);
 
 		if (w0 < 0.0f) {
 
 			w0 = 0.0f;
 		} else {
 
-			w0 = -sqrt(w);
+			w0 = -sqrt(q.w);
 		}
 
 		q.w = w0;
@@ -158,7 +159,7 @@ public:
 		return q;
 	}
 
-	static quat axisAngleToQuaternion(const aem::vec3 v0, float degrees) {
+	static inline quat axisAngleToQuaternion(const aem::vec3 v0, float degrees) {
 
 		float theta = (float) degToRad(degrees);
 		float r = (float) sin(theta / 2.0f);
@@ -167,17 +168,41 @@ public:
 				(float) cos(theta / 2.0f));
 	}
 
+	static vec3 quaternionToEulerAngles(const quat &q0, bool isHomogenous = true) {
+
+		float w_sq = q0.w * q0.w;
+		float x_sq = q0.x * q0.x;
+		float y_sq = q0.y * q0.y;
+		float z_sq = q0.z * q0.z;
+
+		vec3 euler;
+
+		if(isHomogenous) {
+
+			euler.x = atan2f(2.0f * (q0.x * q0.y + q0.z * q0.w), x_sq - y_sq - z_sq + w_sq);
+			euler.y = asinf(-2.0f * (q0.x * q0.z - q0.y * q0.w));
+			euler.z = atan2f(2.0f * (q0.y * q0.z + q0.x * q0.w), -x_sq - y_sq + z_sq + w_sq);
+		} else {
+
+			euler.x = atan2f(2.0f * (q0.z * q0.y + q0.x * q0.w), 1 - 2 * (x_sq + y_sq));
+			euler.y = asinf(-2.0f * (q0.x * q0.z - q0.y * q0.w));
+			euler.z = atan2f(2.0f * (q0.x * q0.y + q0.z * q0.w), 1 - 2 * (y_sq + z_sq));
+		}
+
+		return euler;
+	}
+
 	static quat quat_cast(const mat4 &m) {
 
 		quat q;
 
-		q.w = sqrt(max(0.0f, (1.0f + m.values[0] + m.values[5] + m.values[10])))
+		q.w = sqrt(std::max(0.0f, (1.0f + m.values[0] + m.values[5] + m.values[10])))
 				/ 2;
-		q.x = sqrt(max(0.0f, (1.0f + m.values[0] - m.values[5] - m.values[10])))
+		q.x = sqrt(std::max(0.0f, (1.0f + m.values[0] - m.values[5] - m.values[10])))
 				/ 2;
-		q.y = sqrt(max(0.0f, (1.0f - m.values[0] + m.values[5] - m.values[10])))
+		q.y = sqrt(std::max(0.0f, (1.0f - m.values[0] + m.values[5] - m.values[10])))
 				/ 2;
-		q.z = sqrt(max(0.0f, (1.0f - m.values[0] - m.values[5] + m.values[10])))
+		q.z = sqrt(std::max(0.0f, (1.0f - m.values[0] - m.values[5] + m.values[10])))
 				/ 2;
 
 		q.x = (float) copysign(q.x, m.values[9] - m.values[6]);
