@@ -8,7 +8,7 @@
 #pragma once
 
 #include <iostream>
-#include "Common.h"
+#include "../libaef/Common.h"
 #include "mat4x4.hpp"
 #include "vec3.hpp"
 
@@ -35,7 +35,7 @@ namespace aem {
 		float w;
 
 		//Build the 4th compenent from 3 component quats
-		float generateW(quat const &q) {
+		float generateW(quat &q) {
 
 			float w0 = 1.0f - (x * x) - (y * y) - (z * z);
 
@@ -52,7 +52,7 @@ namespace aem {
 			return w0;
 		}
 
-		static quat normalize(quat const &q) {
+		static quat normalize(quat &q) {
 
 			float magnitude = sqrt(dot(q, q));
 
@@ -88,7 +88,7 @@ namespace aem {
 			return mat;
 		}
 
-		static quat conjugate(quat const &q) {
+		static quat conjugate(quat &q) {
 
 			q.x = -q.x;
 			q.y = -q.y;
