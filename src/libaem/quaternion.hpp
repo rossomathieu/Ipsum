@@ -1,9 +1,9 @@
 /*
-* Class: quat
-* Implements:
-* Author: Ross O. Mathieu
-* Description: Simple quat class. I hate quaternions....
-*/
+ * Class: quat
+ * Implements:
+ * Author: Ross O. Mathieu
+ * Description: Simple quat class. I hate quaternions....
+ */
 
 #pragma once
 
@@ -14,172 +14,285 @@
 
 namespace aem {
 
-	class quat {
+class quat {
 
-	public:
+public:
 
-		quat(void);
-		quat(float x, float y, float z, float w) {
+	quat(void);
+	quat(float x, float y, float z, float w) {
 
-			this->x = x;
-			this->y = y;
-			this->z = z;
-			this->w = w;
+		this->x = x;
+		this->y = y;
+		this->z = z;
+		this->w = w;
+	}
+
+	quat(float w, aem::vec3 &v) {
+
+		this->w = w;
+		this->x = v.x;
+		this->y = v.y;
+		this->z = v.z;
+	}
+
+	quat(aem::vec3 &v, float w) {
+
+		this->w = w;
+		this->x = v.x;
+		this->y = v.y;
+		this->z = v.z;
+	}
+
+	~quat(void);
+
+	float x;
+	float y;
+	float z;
+	float w;
+
+	//Build the 4th compenent from 3 component quats
+	float generateW(quat &q) {
+
+		float w0 = 1.0f - (x * x) - (y * y) - (z * z);
+
+		if (w0 < 0.0f) {
+
+			w0 = 0.0f;
+		} else {
+
+			w0 = -sqrt(w);
 		}
 
-		~quat(void);
+		q.w = w0;
 
-		float x;
-		float y;
-		float z;
-		float w;
+		return w0;
+	}
 
-		//Build the 4th compenent from 3 component quats
-		float generateW(quat &q) {
+	static quat normalize(quat &q) {
 
-			float w0 = 1.0f - (x * x) - (y * y) - (z * z);
+		float magnitude = sqrt(dot(q, q));
 
-			if(w0 < 0.0f) {
+		if (magnitude > 0.0f) {
 
-				w0 = 0.0f;
-			} else {
+			float t = 1.0f / magnitude;
 
-				w0 = -sqrt(w);
-			}
-
-			q.w = w0;
-
-			return w0;
+			q.x *= t;
+			q.y *= t;
+			q.z *= t;
+			q.w *= t;
 		}
 
-		static quat normalize(quat &q) {
+		return q;
+	}
 
-			float magnitude = sqrt(dot(q, q));
+	static float length(const quat &q) {
 
-			if(magnitude > 0.0f) {
+		return (float) sqrt(dot(q, q));
+	}
 
-				float t = 1.0f / magnitude;
+	static float lengthSqr(const quat &q) {
 
-				q.x *= t;
-				q.y *= t;
-				q.z *= t;
-				q.w *= t;
-			}
+		return (float) dot(q, q);
+	}
 
-			return q;
-		}
+	static mat4 mat4_cast(quat const &q) {
 
-		static mat4 mat4_cast(quat const &q) {
+		mat4 mat;
 
-			mat4 mat;
+		mat.values[0] = 1 - 2 * (q.y * q.y) - 2 * (q.z * q.z);
+		mat.values[1] = 2 * (q.x * q.y) + 2 * (q.z * q.w);
+		mat.values[2] = 2 * (q.x * q.z) - 2 * (q.y * q.w);
 
-			mat.values[0] = 1 - 2 * (q.y * q.y) - 2 * (q.z * q.z);
-			mat.values[1] = 2 * (q.x * q.y) + 2 * (q.z * q.w);
-			mat.values[2] = 2 * (q.x * q.z) - 2 * (q.y * q.w);
+		mat.values[4] = 2 * (q.x * q.y) - 2 * (q.z * q.w);
+		mat.values[5] = 1 - 2 * (q.x * q.x) - 2 * (q.z * q.z);
+		mat.values[6] = 2 * (q.y * q.z) + 2 * (q.x * q.w);
 
-			mat.values[4] = 2 * (q.x * q.y) - 2 * (q.z * q.w);
-			mat.values[5] = 1 - 2 * (q.x * q.x) - 2 * (q.z * q.z);
-			mat.values[6] = 2 * (q.y * q.z) + 2 * (q.x * q.w);
+		mat.values[8] = 2 * (q.x * q.z) + 2 * (q.y * q.w);
+		mat.values[9] = 2 * (q.y * q.z) - 2 * (q.x * q.w);
+		mat.values[10] = 1 - 2 * (q.x * q.x) - 2 * (q.y * q.y);
 
-			mat.values[8] = 2 * (q.x * q.z) + 2 * (q.y * q.w);
-			mat.values[9] = 2 * (q.y * q.z) - 2 * (q.x * q.w);
-			mat.values[10] = 1 - 2 * (q.x * q.x) - 2 * (q.y * q.y);
+		return mat;
+	}
 
-			return mat;
-		}
+	static quat conjugate(quat &q) {
 
-		static quat conjugate(quat &q) {
+		q.x = -q.x;
+		q.y = -q.y;
+		q.z = -q.z;
 
-			q.x = -q.x;
-			q.y = -q.y;
-			q.z = -q.z;
+		return q;
+	}
 
-			return q;
-		}
+	static quat invert(quat &q) {
 
-		static float dot(quat const &a, quat const &b) {
+		return conjugate(q) / lengthSqr(q);
 
-			return (a.x * b.x) + (a.y * b.y) + (a.z * b.z) + (a.w * b.w);
-		}
+	}
 
-		static quat eulerAnglesToQuaternion(float pitch, float yaw, float roll) {
+	static float dot(quat const &a, quat const &b) {
 
-			float y0 = (float)degToRad(yaw / 2.0f);
-			float p0 = (float)degToRad(pitch / 2.0f);
-			float r0 = (float)degToRad(roll / 2.0f);
+		return (a.x * b.x) + (a.y * b.y) + (a.z * b.z) + (a.w * b.w);
+	}
 
-			float cosy = (float)cos(y0);
-			float cosp = (float)cos(p0);
-			float cosr = (float)cos(r0);
+	static quat eulerAnglesToQuaternion(float pitch, float yaw, float roll) {
 
-			float siny = (float)sin(y0);
-			float sinp = (float)sin(p0);
-			float sinr = (float)sin(r0);
+		float y0 = (float) degToRad(yaw / 2.0f);
+		float p0 = (float) degToRad(pitch / 2.0f);
+		float r0 = (float) degToRad(roll / 2.0f);
 
-			quat q;
+		float cosy = (float) cos(y0);
+		float cosp = (float) cos(p0);
+		float cosr = (float) cos(r0);
 
-			q.x = cosr * sinp * cosy + sinr * cosp * siny;
-			q.y = cosr * cosp * siny - sinr * sinp * cosy;
-			q.z = sinr * cosp * cosy - cosr * sinp * siny;
-			q.w = cosr * cosp * cosy + sinr * sinp * siny;
+		float siny = (float) sin(y0);
+		float sinp = (float) sin(p0);
+		float sinr = (float) sin(r0);
 
-			return q;
-		}
+		quat q;
 
-		static quat axisAngleToQuaternion(const aem::vec3 v0, float degrees) {
+		q.x = cosr * sinp * cosy + sinr * cosp * siny;
+		q.y = cosr * cosp * siny - sinr * sinp * cosy;
+		q.z = sinr * cosp * cosy - cosr * sinp * siny;
+		q.w = cosr * cosp * cosy + sinr * sinp * siny;
 
-			float theta = (float)degToRad(degrees);
-			float r = (float)sin(theta / 2.0f);
+		return q;
+	}
 
-			return quat((float)(v0.x * r), (float)(v0.y * r), (float)(v0.z * r), (float)cos(theta / 2.0f));
-		}
+	static quat axisAngleToQuaternion(const aem::vec3 v0, float degrees) {
 
-		static quat quat_cast(const mat4 &m) {
+		float theta = (float) degToRad(degrees);
+		float r = (float) sin(theta / 2.0f);
 
-			quat q;
+		return quat((float) (v0.x * r), (float) (v0.y * r), (float) (v0.z * r),
+				(float) cos(theta / 2.0f));
+	}
 
-			q.w = sqrt(max(0.0f, (1.0f + m.values[0] + m.values[5] + m.values[10]))) / 2;
-			q.x = sqrt(max(0.0f, (1.0f + m.values[0] - m.values[5] - m.values[10]))) / 2;
-			q.y = sqrt(max(0.0f, (1.0f - m.values[0] + m.values[5] - m.values[10]))) / 2;
-			q.z = sqrt(max(0.0f, (1.0f - m.values[0] - m.values[5] + m.values[10]))) / 2;
+	static quat quat_cast(const mat4 &m) {
 
-			q.x = (float)copysign(q.x, m.values[9] - m.values[6]);
-			q.y = (float)copysign(q.y, m.values[2] - m.values[8]);
-			q.z = (float)copysign(q.z, m.values[4] - m.values[1]);
+		quat q;
 
-			return q;
-		}
+		q.w = sqrt(max(0.0f, (1.0f + m.values[0] + m.values[5] + m.values[10])))
+				/ 2;
+		q.x = sqrt(max(0.0f, (1.0f + m.values[0] - m.values[5] - m.values[10])))
+				/ 2;
+		q.y = sqrt(max(0.0f, (1.0f - m.values[0] + m.values[5] - m.values[10])))
+				/ 2;
+		q.z = sqrt(max(0.0f, (1.0f - m.values[0] - m.values[5] + m.values[10])))
+				/ 2;
 
-		quat operator *(const quat &q) const {
+		q.x = (float) copysign(q.x, m.values[9] - m.values[6]);
+		q.y = (float) copysign(q.y, m.values[2] - m.values[8]);
+		q.z = (float) copysign(q.z, m.values[4] - m.values[1]);
 
-			quat a;
+		return q;
+	}
 
-			a.w = (w * q.w) - (x * q.x) - (y * q.y) - (z * q.z);
-			a.x = (x * q.w) + (w * q.x) + (y * q.z) - (z * q.y);
-			a.y = (y * q.w) + (w * q.y) + (z * q.x) - (x * q.z);
-			a.z = (z * q.w) + (w * q.z) + (x * q.y) - (y * q.x);
+	quat &operator =(const quat &q) {
 
-			return a;
-		}
+		x = q.x;
+		y = q.y;
+		z = q.z;
+		w = q.w;
 
-		quat operator *(const aem::vec3 &v) const {
+		return *this;
+	}
 
-			quat a;
+	const quat operator +(const quat &q) const {
 
-			a.w = -(x * v.x) - (y * v.y) - (z * v.z);
-			a.x = (w * v.x) + (y * v.z) - (z * v.y);
-			a.y = (w * v.y) + (z * v.x) - (x * v.z);
-			a.z = (w * v.z) + (x * v.y) - (y * v.x);
+		return quat(x + q.x, y + q.y, z + q.z, w + q.w);
+	}
 
-			return a;
-		}
+	const quat operator -(const quat &q) const {
 
-		inline friend std::ostream& operator <<(std::ostream& o, const quat &q) {
+		return quat(x - q.x, y - q.y, z - q.z, w - q.w);
+	}
 
-			o << "Quat(" << q.x << "," << q.y << "," << q.z << "," << q.w << ")" << std::endl;
+	const quat operator *(const quat &q) const {
 
-			return o;
-		}
+		quat a;
 
-	};
+		a.w = (w * q.w) - (x * q.x) - (y * q.y) - (z * q.z);
+		a.x = (x * q.w) + (w * q.x) + (y * q.z) - (z * q.y);
+		a.y = (y * q.w) + (w * q.y) + (z * q.x) - (x * q.z);
+		a.z = (z * q.w) + (w * q.z) + (x * q.y) - (y * q.x);
+
+		return a;
+	}
+
+	const quat operator *(const aem::vec3 &v) const {
+
+		quat a;
+
+		a.w = -(x * v.x) - (y * v.y) - (z * v.z);
+		a.x = (w * v.x) + (y * v.z) - (z * v.y);
+		a.y = (w * v.y) + (z * v.x) - (x * v.z);
+		a.z = (w * v.z) + (x * v.y) - (y * v.x);
+
+		return a;
+	}
+
+	const quat operator *(float scale) const {
+
+		return quat(x * scale, y * scale, z * scale, w * scale);
+	}
+
+	const quat operator /(float scale) const {
+
+		return quat(x / scale, y / scale, z / scale, w / scale);
+	}
+
+	const quat operator -() const {
+
+		return quat(-x, -y, -z, -w);
+	}
+
+	const quat &operator +=(const quat &q) {
+
+		w += q.w;
+		x += q.x;
+		y += q.y;
+		z += q.z;
+
+		return *this;
+	}
+
+	const quat &operator -=(const quat &q) {
+
+		w -= q.w;
+		x -= q.x;
+		y -= q.y;
+		z -= q.z;
+
+		return *this;
+	}
+
+	const quat &operator *=(float scale) {
+
+		this->x = x * scale;
+		this->y = y * scale;
+		this->z = z * scale;
+		this->w = w * scale;
+
+		return *this;
+	}
+
+	const quat &operator /=(float scale) {
+
+		this->x = x / scale;
+		this->y = y / scale;
+		this->z = z / scale;
+		this->w = w / scale;
+
+		return *this;
+	}
+
+	inline friend std::ostream& operator <<(std::ostream& o, const quat &q) {
+
+		o << "Quat(" << q.x << "," << q.y << "," << q.z << "," << q.w << ")"
+				<< std::endl;
+
+		return o;
+	}
+
+};
 }
