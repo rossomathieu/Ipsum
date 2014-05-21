@@ -14,6 +14,7 @@
 #include <GL/gl.h>
 #include <GL/glx.h>
 #include <GL/glu.h>
+#include "GlXWindow.h"
 
 Display                 *dpy;
 Window                  root;
@@ -47,6 +48,7 @@ void DrawAQuad() {
  glEnd();
 } 
 
+
 int main(int argc, char *argv[]) {
 
  dpy = XOpenDisplay(NULL);
@@ -65,7 +67,7 @@ int main(int argc, char *argv[]) {
         exit(0);
  } 
  else {
-        printf("\n\tvisual %p selected\n", (void *)vi->visualid); /* %p creates hexadecimal output like in glxinfo*/
+        printf("\n\tvisual %p selected\n", (void *)vi->visualid);
  }
 
 
@@ -113,5 +115,18 @@ int main(int argc, char *argv[]) {
         	}
 
         }
-    } /* this closes while(1) { */
-} /* this is the } which closes int main(int argc, char *argv[]) { */
+    }
+}
+
+/*
+int main(int argc, char* argv[]) {
+
+	GlXWindow *pWindow = new GlXWindow();
+
+	pWindow->create(std::string("Test"), 800, 600, false);
+
+	while(1) {
+
+		pWindow->swapBuffers();
+	}
+}*/

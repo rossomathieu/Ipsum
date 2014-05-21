@@ -1,6 +1,6 @@
 #include <assert.h>
-#include "AECamera.h"
-#include "../libaem/matrix_transform.hpp"
+#include "../../include/libgraphics/AECamera.h"
+#include "../../include/libmath/matrix_transform.hpp"
 
 using namespace aeg;
 

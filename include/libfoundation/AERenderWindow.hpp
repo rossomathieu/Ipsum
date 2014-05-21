@@ -15,9 +15,6 @@ class AERenderWindow {
 
 public:
 
-	AERenderWindow();
-	virtual ~AERenderWindow();
-
 	virtual void create(const std::string &name, unsigned int width, unsigned int height, bool fullScreen) = 0;
 
 	virtual void setFullScreen(bool fullScreen, unsigned int width, unsigned int height)
@@ -45,8 +42,6 @@ public:
 
 	virtual unsigned int getVSyncInterval() const { return 1; }
 
-	//virtual bool isActive(void) const { return mActive && isVisible(); }
-
 	virtual bool isClosed(void) const = 0;
 
 	virtual bool isPrimary(void) const;
@@ -55,18 +50,16 @@ public:
 
 	virtual void getMetrics(unsigned int &width, unsigned int &height, unsigned int &colorDepth, int &left, int &top);
 
-	bool isDeactivatedOnFocusChange() const;
-
-	void setDeactivateOnFocusChange(bool deactivate);
+	virtual void swapBuffers() = 0;
 
 protected:
 
+	AERenderWindow();
+	~AERenderWindow() {}
 	bool mIsFullScreen;
 	bool mIsPrimary;
 	int mLeft;
 	int mTop;
-
-	void _setPrimary() { mIsPrimary = true; }
 };
 
 #endif /* AEWINDOW_H_ */

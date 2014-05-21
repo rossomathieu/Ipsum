@@ -19,7 +19,10 @@ class quat {
 
 public:
 
-	quat(void) : x(0), y(0), z(0), w(0){};
+	quat(void) :
+			x(0), y(0), z(0), w(0) {
+	}
+
 	quat(float x, float y, float z, float w) {
 
 		this->x = x;
@@ -28,7 +31,7 @@ public:
 		this->w = w;
 	}
 
-	quat(float w, aem::vec3 &v) {
+	quat(float w, const aem::vec3 &v) {
 
 		this->w = w;
 		this->x = v.x;
@@ -36,7 +39,7 @@ public:
 		this->z = v.z;
 	}
 
-	quat(aem::vec3 &v, float w) {
+	quat(const aem::vec3 &v, float w) {
 
 		this->w = w;
 		this->x = v.x;
@@ -44,7 +47,9 @@ public:
 		this->z = v.z;
 	}
 
-	~quat(void) {};
+	~quat(void) {
+	}
+
 
 	float x;
 	float y;
@@ -159,7 +164,8 @@ public:
 		return q;
 	}
 
-	static inline quat axisAngleToQuaternion(const aem::vec3 v0, float degrees) {
+	static inline quat axisAngleToQuaternion(const aem::vec3 v0,
+			float degrees) {
 
 		float theta = (float) degToRad(degrees);
 		float r = (float) sin(theta / 2.0f);
@@ -168,7 +174,8 @@ public:
 				(float) cos(theta / 2.0f));
 	}
 
-	static vec3 quaternionToEulerAngles(const quat &q0, bool isHomogenous = true) {
+	static vec3 quaternionToEulerAngles(const quat &q0,
+			bool isHomogenous = true) {
 
 		float w_sq = q0.w * q0.w;
 		float x_sq = q0.x * q0.x;
@@ -177,16 +184,20 @@ public:
 
 		vec3 euler;
 
-		if(isHomogenous) {
+		if (isHomogenous) {
 
-			euler.x = atan2f(2.0f * (q0.x * q0.y + q0.z * q0.w), x_sq - y_sq - z_sq + w_sq);
+			euler.x = atan2f(2.0f * (q0.x * q0.y + q0.z * q0.w),
+					x_sq - y_sq - z_sq + w_sq);
 			euler.y = asinf(-2.0f * (q0.x * q0.z - q0.y * q0.w));
-			euler.z = atan2f(2.0f * (q0.y * q0.z + q0.x * q0.w), -x_sq - y_sq + z_sq + w_sq);
+			euler.z = atan2f(2.0f * (q0.y * q0.z + q0.x * q0.w),
+					-x_sq - y_sq + z_sq + w_sq);
 		} else {
 
-			euler.x = atan2f(2.0f * (q0.z * q0.y + q0.x * q0.w), 1 - 2 * (x_sq + y_sq));
+			euler.x = atan2f(2.0f * (q0.z * q0.y + q0.x * q0.w),
+					1 - 2 * (x_sq + y_sq));
 			euler.y = asinf(-2.0f * (q0.x * q0.z - q0.y * q0.w));
-			euler.z = atan2f(2.0f * (q0.x * q0.y + q0.z * q0.w), 1 - 2 * (y_sq + z_sq));
+			euler.z = atan2f(2.0f * (q0.x * q0.y + q0.z * q0.w),
+					1 - 2 * (y_sq + z_sq));
 		}
 
 		return euler;
@@ -196,14 +207,18 @@ public:
 
 		quat q;
 
-		q.w = sqrt(std::max(0.0f, (1.0f + m.values[0] + m.values[5] + m.values[10])))
-				/ 2;
-		q.x = sqrt(std::max(0.0f, (1.0f + m.values[0] - m.values[5] - m.values[10])))
-				/ 2;
-		q.y = sqrt(std::max(0.0f, (1.0f - m.values[0] + m.values[5] - m.values[10])))
-				/ 2;
-		q.z = sqrt(std::max(0.0f, (1.0f - m.values[0] - m.values[5] + m.values[10])))
-				/ 2;
+		q.w = sqrt(
+				std::max(0.0f,
+						(1.0f + m.values[0] + m.values[5] + m.values[10]))) / 2;
+		q.x = sqrt(
+				std::max(0.0f,
+						(1.0f + m.values[0] - m.values[5] - m.values[10]))) / 2;
+		q.y = sqrt(
+				std::max(0.0f,
+						(1.0f - m.values[0] + m.values[5] - m.values[10]))) / 2;
+		q.z = sqrt(
+				std::max(0.0f,
+						(1.0f - m.values[0] - m.values[5] + m.values[10]))) / 2;
 
 		q.x = (float) copysign(q.x, m.values[9] - m.values[6]);
 		q.y = (float) copysign(q.y, m.values[2] - m.values[8]);
@@ -244,16 +259,28 @@ public:
 		return a;
 	}
 
-	const quat operator *(const aem::vec3 &v) const {
+	/*const quat operator *(const aem::vec3 &v) const {
 
-		quat a;
+	 quat a;
 
-		a.w = -(x * v.x) - (y * v.y) - (z * v.z);
-		a.x = (w * v.x) + (y * v.z) - (z * v.y);
-		a.y = (w * v.y) + (z * v.x) - (x * v.z);
-		a.z = (w * v.z) + (x * v.y) - (y * v.x);
+	 a.w = -(x * v.x) - (y * v.y) - (z * v.z);
+	 a.x = (w * v.x) + (y * v.z) - (z * v.y);
+	 a.y = (w * v.y) + (z * v.x) - (x * v.z);
+	 a.z = (w * v.z) + (x * v.y) - (y * v.x);
 
-		return a;
+	 return a;
+	 }*/
+
+	const vec3 operator *(const vec3 &v) const {
+
+		quat a(0.0f, v);
+		quat b = *this;
+		quat c = conjugate(b) * a * b;
+		return vec3(c.x, c.y, c.z);
+
+		//Faster method..sort of
+		//vec3 t = aem::vec3::cross(vec3(this->x, this->y, this->z), v) * 2;
+		//return v + this->w * t + aem::vec3::cross(vec3(this->x, this->y, this->z), t);
 	}
 
 	const quat operator *(float scale) const {

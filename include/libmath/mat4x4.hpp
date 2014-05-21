@@ -21,7 +21,7 @@ namespace aem {
 			toZero();
 		};
 
-		mat4(float elements[16]){};
+		//mat4(float elements[16]){};
 		~mat4(void){};
 
 		float values[16];

@@ -63,9 +63,19 @@ namespace aem {
 			z = -z;
 		}
 
+		void project(const vec3 &v) {
+
+			*this = v * (*this * v) / (v * v);
+		}
+
 		vec3 inverse() const {
 
 			return vec3(-x, -y, -z);
+		}
+
+		vec3 projected(const vec3 &v) {
+
+			return v *(*this * v) / (v * v);
 		}
 
 		static float dot(const vec3 &a, const vec3 &b) {
@@ -76,6 +86,16 @@ namespace aem {
 		static vec3 cross(const vec3 &a, const vec3 &b) {
 
 			return vec3((a.y * b.z) - (a.z * b.y), (a.z * b.x) - (a.x * b.z), (a.x * b.y) - (a.y * b.x));
+		}
+
+		static inline float angle(const vec3 &v0, const vec3 &v1) {
+
+			return acosf(dot(v0, v1) / (v0.length() * v1.length()));
+		}
+
+		static inline float angle_normalized(const vec3 &v0, const vec3 &v1) {
+
+			return acosf(dot(v0, v1));
 		}
 
 		inline friend std::ostream& operator <<(std::ostream& out, const vec3& v) {
@@ -132,6 +152,11 @@ namespace aem {
 		inline vec3 operator /(const vec3 &a) const {
 
 			return vec3(x / a.x, y / a.y, z / a.z);
+		}
+
+		inline vec3 operator %(const vec3 &a) const {
+
+			return vec3(y * a.z - z * a.y, z * a.x - x * a.z, x * a.y - y * a.x);
 		}
 
 		inline bool operator ==(const vec3 &a) const {

@@ -6,8 +6,8 @@
  */
 
 #include <cmath>
-#include "AEDebugDraw.h"
-#include "../../libaef/Common.h"
+#include "libgraphics/libdebug/AEDebugDraw.h"
+#include "../../libfoundation/Common.h"
 
 AEDebugDraw::AEDebugDraw() {
 	// TODO Auto-generated constructor stub

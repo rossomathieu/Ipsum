@@ -1,5 +1,8 @@
 //#pragma once
 
+#include <GL/glew.h>
+#include <GL/gl.h>
+#include <GL/glext.h>
 #include <string>
 
 namespace aeg {
@@ -27,7 +30,7 @@ namespace aeg {
 
 		@throws std::exception if an error occurs
 		*/
-		virtual AEShader shaderFromFile(const std::string& filePath, ShaderType shaderType);
+		AEShader shaderFromFile(const std::string& filePath, ShaderType shaderType);
 
 		/**
 		Creates a shader from a string of shader source code.
@@ -42,13 +45,13 @@ namespace aeg {
 		/**
 		@result		The shader's object ID
 		*/
-		virtual unsigned int object() const;
+		unsigned int object() const;
 
 		//aeg::AEShader objects can be copied and assigned because they are referenced counted
 		//like a shadered pointer
 		AEShader(const AEShader& other);
 		AEShader& operator =(const AEShader& other);
-		virtual ~AEShader();
+		~AEShader();
 
 	private:
 

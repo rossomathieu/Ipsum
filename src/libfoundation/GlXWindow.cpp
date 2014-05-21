@@ -9,26 +9,16 @@
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 #include <stdexcept>
+#include <GL/glx.h>
 
 GlXWindow::GlXWindow() {
 
-	mWindow = 0;
-
-	mIsFullScreen = false;
-	mClosed = false;
-	//mActive = false;
-	mHidden = false;
-	mVSync = false;
-	mVSyncInterval = 1;
-}
-
-GlXWindow::~GlXWindow() {
 
 }
 
 void GlXWindow::create(const std::string &name, uint width, uint height, bool fullScreen) {
 
-	Display *mxDisplay = XOpenDisplay(NULL);
+	mxDisplay = XOpenDisplay(NULL);
 	std::string title = name;
 	//uint samples = 0;
 	//short frequency = 0;
@@ -53,7 +43,7 @@ void GlXWindow::create(const std::string &name, uint width, uint height, bool fu
 		if(!XGetWindowAttributes(mxDisplay, parentWindow, &windowAttrib) ||
 				windowAttrib.root != DefaultRootWindow(mxDisplay)) {
 
-			throw std::exception("Invalid parentWindowHandle (wrong server or screen");
+			throw std::runtime_error("Invalid parentWindowHandle (wrong server or screen");
 		}
 	}
 
@@ -65,7 +55,7 @@ void GlXWindow::create(const std::string &name, uint width, uint height, bool fu
 		if(!XGetWindowAttributes(mxDisplay, externalWindow, &windowAttrib) ||
 				windowAttrib.root != DefaultRootWindow(mxDisplay)) {
 
-			throw std::exception("Invalid externalWindowHandle (wrong server or screen");
+			throw std::runtime_error("Invalid externalWindowHandle (wrong server or screen");
 		}
 
 		glxDrawable = externalWindow;
@@ -88,7 +78,7 @@ void GlXWindow::create(const std::string &name, uint width, uint height, bool fu
 
 	if(!mWindow) {
 
-		throw std::exception("Unable to create an X Window");
+		throw std::runtime_error("Unable to create an X Window");
 	}
 
 	glxDrawable = mWindow;
@@ -100,9 +90,9 @@ void GlXWindow::create(const std::string &name, uint width, uint height, bool fu
 	setVSyncEnabled(vsync);
 }
 
-void GlXWindow::setFullscreen(bool fullscreen, uint width, uint height) {
+void GlXWindow::setFullScreen(bool fullscreen, uint width, uint height) {
 
-
+	mIsFullScreen = fullscreen;
 }
 
 void GlXWindow::release(void) {
@@ -141,6 +131,11 @@ void GlXWindow::setHidden(bool hidden) {
 			switchFullScreen(true);
 		}
 	}
+}
+
+bool GlXWindow::isFullScreen() const {
+
+	return mIsFullScreen;
 }
 
 void GlXWindow::setVSyncEnabled(bool vsync) {
@@ -194,6 +189,23 @@ void GlXWindow::resize(unsigned int width, unsigned int height) {
 
 void GlXWindow::swapBuffers() {
 
+	glXSwapBuffers(mxDisplay, mWindow);
+}
+
+
+bool GlXWindow::isPrimary() const {
+
+	return mIsPrimary;
+}
+
+void GlXWindow::switchFullScreen(bool fullscreen) {
+
+	mIsFullScreen = fullscreen;
+}
+
+void getMetrics(unsigned int &width, unsigned int &height, unsigned int &colorDepth, int &left, int &top) {
 
 }
+
+
 

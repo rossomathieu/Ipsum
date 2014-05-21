@@ -11,15 +11,14 @@
 #include "AERenderWindow.hpp"
 #include <X11/Xlib.h>
 
-class GlXWindow : public AERenderWindow {
+class GlXWindow {
 
 public:
 	GlXWindow();
-	virtual ~GlXWindow();
 
 	void create(const std::string &name, unsigned int width, unsigned int height, bool fullScreen);
 
-	void setFullscreen(bool fullscreen, uint width, uint height);
+	void setFullScreen(bool fullscreen, uint width, uint height);
 
 	void release(void);
 
@@ -47,6 +46,12 @@ public:
 
 	void swapBuffers();
 
+	bool isPrimary(void) const;
+
+	bool isFullScreen(void) const;
+
+	void getMetrics(unsigned int &width, unsigned int &height, unsigned int &colorDepth, int &left, int &top);
+
 private:
 
 	bool mClosed;
@@ -54,6 +59,8 @@ private:
 	bool mHidden;
 	bool mVSync;
 	int mVSyncInterval;
+	bool mIsFullScreen;
+	bool mIsPrimary;
 
 	::Window mWindow;
 	::Display *mxDisplay;
